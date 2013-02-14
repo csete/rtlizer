@@ -1,0 +1,2 @@
+gcc kiss_fft.c rtlizer.c -Wall -O2 -o rtlizer -lm `pkg-config --cflags --libs gtk+-2.0 librtlsdr`
+

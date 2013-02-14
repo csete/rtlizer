@@ -1,0 +1,13 @@
+# Start rtlizer automatically on a Beaglebone that uses systemd.
+
+[Unit]
+Description=Run rtlizer
+After=multi-user.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/xinit /home/root/rtlizer/rtlizer
+
+[Install]
+#WantedBy=multi-user.target
+

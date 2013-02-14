@@ -1,0 +1,2 @@
+
+gcc -march=armv7-a -fno-tree-vectorize  -mthumb-interwork -mfloat-abi=softfp -mfpu=neon -mtune=cortex-a8 -O2 -pipe -g -feliminate-unused-debug-types -Wall -Wextra -Wno-unused -Wsign-compare -fPIC -fvisibility=hidden -O2 -pipe -g -feliminate-unused-debug-types -Wall -Wextra -Wno-unused -Wsign-compare -lm `pkg-config --cflags --libs gtk+-2.0 librtlsdr` -o rtlizer kiss_fft.c rtlizer.c
