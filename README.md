@@ -20,7 +20,7 @@ Build
 There are no makefiles, just two simple scripts containing a gcc command line:
 
 * build - for building on i386-like computers
-* build-target - for building rtlizer directly on the Beaglebone or copatible boards
+* build-target - for building rtlizer directly on the Beaglebone or compatible boards
 
 Usage
 -----
