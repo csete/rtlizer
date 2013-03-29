@@ -120,6 +120,18 @@ gint keypress_cb(GtkWidget *widget, GdkEvent *event, gpointer data)
         }
         break;
 
+	case GDK_KEY_4:
+		samp_rate = 1024000;
+		r = rtlsdr_set_sample_rate(dev, samp_rate);
+		if (r < 0)
+			fprintf(stderr, "WARNING: Failed to set sample rate.\n");
+
+		frequency = 433920000;
+		r = rtlsdr_set_center_freq(dev, frequency);
+		if (r < 0)
+			fprintf(stderr, "WARNING: Failed to set center freq.\n");
+        break;
+
 	default:
 		event_handled = FALSE;
 		break;
