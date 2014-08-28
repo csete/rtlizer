@@ -29,6 +29,8 @@ You can basically run rtlizer as is in an X11 environment. The default window si
 
   rtlizer 640x360+0+0
 
+Also you can run rtlizer with a command-line options, see rtlizer -h.
+
 On the Beaglebone I am running my own built linux with X but no display or window manager. In this case I start rtlizer using the xinit command.
 Recipes for creating such linux images are available under the [nanosdr project](https://github.com/csete/nanosdr).
 

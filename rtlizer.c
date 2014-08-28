@@ -24,6 +24,7 @@
 #include <gtk/gtk.h>
 #include <rtl-sdr.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "kiss_fft.h"
 
@@ -37,6 +38,7 @@ uint32_t dev_index = 0;
 uint32_t frequency = 98000000;
 uint32_t samp_rate = DEFAULT_SAMPLE_RATE;
 uint32_t buff_len = 2048;
+int ppm_error = 0;
 
 int fft_size = 320;
 kiss_fft_cfg  fft_cfg;
@@ -216,6 +218,12 @@ static void setup_rtlsdr()
         exit(1);
     }
 
+    if ( ppm_error != 0 ) {
+        r = rtlsdr_set_freq_correction(dev, ppm_error);
+        if (r < 0)
+            fprintf(stderr, "WARNING: Failed to set PPM error.\n");
+    }
+
     r = rtlsdr_set_sample_rate(dev, samp_rate);
     if (r < 0)
         fprintf(stderr, "WARNING: Failed to set sample rate.\n");
@@ -313,6 +321,7 @@ int main(int argc, char *argv[])
     /* GtkWidget is the storage type for widgets */
     GtkWidget *window;
     guint  tid;
+    int opt;
     
     gtk_init (&argc, &argv);
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -322,13 +331,34 @@ int main(int argc, char *argv[])
     g_signal_connect(window, "destroy", G_CALLBACK (destroy), NULL);
     g_signal_connect(window, "key_press_event", G_CALLBACK (keypress_cb), NULL);
 
+    /* parse cmd line */
+    while ((opt = getopt(argc, argv, "d:f:p:h")) != -1) {
+        switch (opt) {
+            case 'd':
+                dev_index = atoi(optarg);
+                break;
+            case 'f':
+                frequency = atoll(optarg);
+                break;
+            case 'p':
+                ppm_error = atoi(optarg);
+                break;
+            case 'h':
+            case '?':
+            default:
+                printf("usage: rtlizer [-d device_index] [-f frequency [Hz]] [-p ppm_error] [WIDTHxHEIGHT+XOFF+YOFF]\n");
+                exit(EXIT_SUCCESS);
+                break;
+        }
+    }
+
     /* default window size if no geometry is specified */
     width = 320;  //gdk_screen_width();
     height = 240; //gdk_screen_height();
-    if (argc > 1)
+    if (argc > optind)
     {
-        if (!gtk_window_parse_geometry(GTK_WINDOW(window), argv[1]))
-            fprintf(stderr, "Failed to parse '%s'\n", argv[1]);
+        if (!gtk_window_parse_geometry(GTK_WINDOW(window), argv[optind]))
+            fprintf(stderr, "Failed to parse '%s'\n", argv[optind]);
         else
             gtk_window_get_default_size(GTK_WINDOW(window), &width, &height);
     }
