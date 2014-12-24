@@ -29,7 +29,7 @@
 #include "kiss_fft.h"
 
 
-#define DEFAULT_SAMPLE_RATE 2000000
+#define DEFAULT_SAMPLE_RATE 2048000
 #define DYNAMIC_RANGE 90.f  /* -dBFS coreresponding to bottom of screen */
 #define SCREEN_FRAC 0.7f  /* fraction of screen height used for FFT */
 
@@ -52,6 +52,7 @@ int text_margin = 0;
 static rtlsdr_dev_t *dev = NULL;
 static gint width, height; /* screen width and height */
 static gboolean freq_changed = TRUE;
+
 
 
 static gboolean delete_event(GtkWidget *widget, GdkEvent *e, gpointer d)
@@ -101,10 +102,10 @@ gint keypress_cb(GtkWidget *widget, GdkEvent *event, gpointer data)
         break;
 
 	case GDK_KEY_Up:
-		/* increase bandwidth with 200 kHz */
-        if (samp_rate < 2400000)
+		/* increase bandwidth with 256 kHz */
+        if (samp_rate < 2304000)
         {
-            samp_rate += 200000;
+            samp_rate += 256000;
             r = rtlsdr_set_sample_rate(dev, samp_rate);
             if (r < 0)
                 fprintf(stderr, "WARNING: Failed to set sample rate.\n");
@@ -112,10 +113,10 @@ gint keypress_cb(GtkWidget *widget, GdkEvent *event, gpointer data)
         break;
 
 	case GDK_KEY_Down:
-		/* decrease bandwidth with 100 kHz */
-        if (samp_rate > 600000)
+		/* decrease bandwidth with 256 kHz */
+        if (samp_rate > 1024000)
         {
-            samp_rate -= 200000;
+            samp_rate -= 256000;
             r = rtlsdr_set_sample_rate(dev, samp_rate);
             if (r < 0)
                 fprintf(stderr, "WARNING: Failed to set sample rate.\n");
@@ -141,8 +142,8 @@ static void draw_text(cairo_t *cr)
     double txt1_y, txt2_y;
 
     gchar *freq_str = g_strdup_printf("%.3f MHz", 1.e-6f*(float)frequency);
-    gchar *delta_str = g_strdup_printf("BW: %.1f MHz   RBW: %.2f kHz",
-                                       1.e-6f*(float)samp_rate,
+    gchar *delta_str = g_strdup_printf("BW: %.1f kHz   RBW: %.2f kHz",
+                                       1.e-3f*(float)samp_rate,
                                        1.e-3f*(float)(samp_rate/fft_size));
 
     /* clear area */
