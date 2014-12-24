@@ -30,41 +30,41 @@
 
 
 #define DEFAULT_SAMPLE_RATE 2048000
-#define DYNAMIC_RANGE 90.f  /* -dBFS coreresponding to bottom of screen */
-#define SCREEN_FRAC 0.7f  /* fraction of screen height used for FFT */
+#define DYNAMIC_RANGE 90.f      /* -dBFS coreresponding to bottom of screen */
+#define SCREEN_FRAC 0.7f        /* fraction of screen height used for FFT */
 
-uint8_t *buffer;
-uint32_t dev_index = 0;
-uint32_t frequency = 98000000;
-uint32_t samp_rate = DEFAULT_SAMPLE_RATE;
-uint32_t buff_len = 2048;
-int ppm_error = 0;
+uint8_t        *buffer;
+uint32_t        dev_index = 0;
+uint32_t        frequency = 98000000;
+uint32_t        samp_rate = DEFAULT_SAMPLE_RATE;
+uint32_t        buff_len = 2048;
+int             ppm_error = 0;
 
-int fft_size = 320;
-kiss_fft_cfg  fft_cfg;
-kiss_fft_cpx *fft_in;
-kiss_fft_cpx *fft_out;
-float         *log_pwr_fft; /* dbFS relative to 1.0 */
-float scale;
-int yzero = 0;
-int text_margin = 0;
+int             fft_size = 320;
+kiss_fft_cfg    fft_cfg;
+kiss_fft_cpx   *fft_in;
+kiss_fft_cpx   *fft_out;
+float          *log_pwr_fft;    /* dbFS relative to 1.0 */
+float           scale;
+int             yzero = 0;
+int             text_margin = 0;
 
 static rtlsdr_dev_t *dev = NULL;
-static gint width, height; /* screen width and height */
+static gint     width, height;  /* screen width and height */
 static gboolean freq_changed = TRUE;
 
 
 
-static gboolean delete_event(GtkWidget *widget, GdkEvent *e, gpointer d)
+static gboolean delete_event(GtkWidget * widget, GdkEvent * e, gpointer d)
 {
     return FALSE;
 }
 
-static void destroy(GtkWidget *widget, gpointer data)
+static void destroy(GtkWidget * widget, gpointer data)
 {
-   	rtlsdr_close(dev);
-	free(buffer);
-    
+    rtlsdr_close(dev);
+    free(buffer);
+
     free(fft_cfg);
     free(fft_in);
     free(fft_out);
@@ -73,36 +73,36 @@ static void destroy(GtkWidget *widget, gpointer data)
     gtk_main_quit();
 }
 
-gint keypress_cb(GtkWidget *widget, GdkEvent *event, gpointer data)
+gint keypress_cb(GtkWidget * widget, GdkEvent * event, gpointer data)
 {
-	guint event_handled = TRUE;
-    int r;
-	
-	switch (event->key.keyval)
-	{
-	case GDK_KEY_Return:
-		/* exit application */
-		gtk_widget_destroy(widget);
-		break;
+    guint           event_handled = TRUE;
+    int             r;
 
-	case GDK_KEY_Left:
-		/* increase frequency */
-        frequency += samp_rate/4;
+    switch (event->key.keyval)
+    {
+    case GDK_KEY_Return:
+        /* exit application */
+        gtk_widget_destroy(widget);
+        break;
+
+    case GDK_KEY_Left:
+        /* increase frequency */
+        frequency += samp_rate / 4;
         r = rtlsdr_set_center_freq(dev, frequency);
         if (r < 0)
             fprintf(stderr, "WARNING: Failed to set center freq.\n");
         break;
 
-	case GDK_KEY_Right:
-		/* decrease frequency */
-        frequency -= samp_rate/4;
+    case GDK_KEY_Right:
+        /* decrease frequency */
+        frequency -= samp_rate / 4;
         r = rtlsdr_set_center_freq(dev, frequency);
         if (r < 0)
             fprintf(stderr, "WARNING: Failed to set center freq.\n");
         break;
 
-	case GDK_KEY_Up:
-		/* increase bandwidth with 256 kHz */
+    case GDK_KEY_Up:
+        /* increase bandwidth with 256 kHz */
         if (samp_rate < 2304000)
         {
             samp_rate += 256000;
@@ -112,8 +112,8 @@ gint keypress_cb(GtkWidget *widget, GdkEvent *event, gpointer data)
         }
         break;
 
-	case GDK_KEY_Down:
-		/* decrease bandwidth with 256 kHz */
+    case GDK_KEY_Down:
+        /* decrease bandwidth with 256 kHz */
         if (samp_rate > 1024000)
         {
             samp_rate -= 256000;
@@ -123,28 +123,30 @@ gint keypress_cb(GtkWidget *widget, GdkEvent *event, gpointer data)
         }
         break;
 
-	default:
-		event_handled = FALSE;
-		break;
-	}
+    default:
+        event_handled = FALSE;
+        break;
+    }
 
-	return event_handled;
+    return event_handled;
 }
 
 static int db_to_pixel(float dbfs)
 {
-    return yzero+(int)(-dbfs*scale);
+    return yzero + (int)(-dbfs * scale);
 }
 
-static void draw_text(cairo_t *cr)
+static void draw_text(cairo_t * cr)
 {
     cairo_text_extents_t cte;
-    double txt1_y, txt2_y;
+    double          txt1_y, txt2_y;
 
-    gchar *freq_str = g_strdup_printf("%.3f MHz", 1.e-6f*(float)frequency);
-    gchar *delta_str = g_strdup_printf("BW: %.1f kHz   RBW: %.2f kHz",
-                                       1.e-3f*(float)samp_rate,
-                                       1.e-3f*(float)(samp_rate/fft_size));
+    gchar          *freq_str =
+        g_strdup_printf("%.3f MHz", 1.e-6f * (float)frequency);
+    gchar          *delta_str = g_strdup_printf("BW: %.1f kHz   RBW: %.2f kHz",
+                                                1.e-3f * (float)samp_rate,
+                                                1.e-3f * (float)(samp_rate /
+                                                                 fft_size));
 
     /* clear area */
     cairo_set_source_rgb(cr, 0.02, 0.02, 0.09);
@@ -154,8 +156,7 @@ static void draw_text(cairo_t *cr)
     cairo_fill(cr);
 
     cairo_select_font_face(cr, "Sans",
-                           CAIRO_FONT_SLANT_NORMAL,
-                           CAIRO_FONT_WEIGHT_BOLD);
+                           CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
     cairo_set_font_size(cr, 24);
     cairo_text_extents(cr, freq_str, &cte);
     txt1_y = text_margin + cte.height;
@@ -174,7 +175,7 @@ static void draw_text(cairo_t *cr)
     g_free(delta_str);
 }
 
-static void draw_fft(cairo_t *cr)
+static void draw_fft(cairo_t * cr)
 {
     cairo_set_source_rgb(cr, 0.02, 0.02, 0.09);
     cairo_set_line_width(cr, 1.0);
@@ -186,8 +187,9 @@ static void draw_fft(cairo_t *cr)
     //cairo_set_source_rgba(cr, 0.49, 0.50, 0.63, 0.85);
     cairo_set_source_rgba(cr, 0.7, 0.7, 0.7, 0.9);
 
-    int x, y;
-    for (x = 0; x < width; x++ )
+    int             x, y;
+
+    for (x = 0; x < width; x++)
     {
         y = db_to_pixel(log_pwr_fft[x]);
         g_random_int_range(10, 100);
@@ -195,13 +197,13 @@ static void draw_fft(cairo_t *cr)
         cairo_line_to(cr, x, y);
     }
 
-    cairo_stroke(cr);    
+    cairo_stroke(cr);
 }
 
 static void setup_rtlsdr()
 {
-    int device_count;
-    int r;
+    int             device_count;
+    int             r;
 
     buffer = malloc(buff_len * sizeof(uint8_t));
 
@@ -219,7 +221,8 @@ static void setup_rtlsdr()
         exit(1);
     }
 
-    if ( ppm_error != 0 ) {
+    if (ppm_error != 0)
+    {
         r = rtlsdr_set_freq_correction(dev, ppm_error);
         if (r < 0)
             fprintf(stderr, "WARNING: Failed to set PPM error.\n");
@@ -235,7 +238,7 @@ static void setup_rtlsdr()
 
     r = rtlsdr_set_tuner_gain_mode(dev, 0);
     if (r < 0)
-		fprintf(stderr, "WARNING: Failed to enable automatic gain.\n");
+        fprintf(stderr, "WARNING: Failed to enable automatic gain.\n");
 
     r = rtlsdr_reset_buffer(dev);
     if (r < 0)
@@ -245,18 +248,21 @@ static void setup_rtlsdr()
 
 static gboolean read_rtlsdr()
 {
-    gboolean error = FALSE;
-    int n_read;
-    int r;
+    gboolean        error = FALSE;
+    int             n_read;
+    int             r;
 
     r = rtlsdr_read_sync(dev, buffer, buff_len, &n_read);
-    if (r < 0) {
+    if (r < 0)
+    {
         fprintf(stderr, "WARNING: sync read failed.\n");
         error = TRUE;
     }
 
-    if ((uint32_t)n_read < buff_len) {
-        fprintf(stderr, "Short read (%d / %d), samples lost, exiting!\n", n_read, buff_len);
+    if ((uint32_t) n_read < buff_len)
+    {
+        fprintf(stderr, "Short read (%d / %d), samples lost, exiting!\n",
+                n_read, buff_len);
         error = TRUE;
     }
 
@@ -264,15 +270,15 @@ static gboolean read_rtlsdr()
 }
 
 static void run_fft()
-{   
-    int i;
-    kiss_fft_cpx pt;
-    float pwr;
-    
+{
+    int             i;
+    kiss_fft_cpx    pt;
+    float           pwr;
+
     for (i = 0; i < fft_size; i++)
     {
-        fft_in[i].r = ((float)buffer[2*i])/255.f;
-        fft_in[i].i = ((float)buffer[2*i+1])/255.f;
+        fft_in[i].r = ((float)buffer[2 * i]) / 255.f;
+        fft_in[i].i = ((float)buffer[2 * i + 1]) / 255.f;
     }
     kiss_fft(fft_cfg, fft_in, fft_out);
     for (i = 0; i < fft_size; i++)
@@ -280,82 +286,86 @@ static void run_fft()
         /* shift, normalize and convert to dBFS */
         if (i < fft_size / 2)
         {
-            pt.r = fft_out[fft_size/2+i].r / fft_size;
-            pt.i = fft_out[fft_size/2+i].i / fft_size;
+            pt.r = fft_out[fft_size / 2 + i].r / fft_size;
+            pt.i = fft_out[fft_size / 2 + i].i / fft_size;
         }
         else
         {
-            pt.r = fft_out[i-fft_size/2].r / fft_size;
-            pt.i = fft_out[i-fft_size/2].i / fft_size;
+            pt.r = fft_out[i - fft_size / 2].r / fft_size;
+            pt.i = fft_out[i - fft_size / 2].i / fft_size;
         }
         pwr = pt.r * pt.r + pt.i * pt.i;
-        
+
         log_pwr_fft[i] = 10.f * log10(pwr + 1.0e-20f);
     }
 }
 
 gint timeout_cb(gpointer darea)
 {
-	/* get samples from rtlsdr */
-	if (read_rtlsdr())
-        return FALSE;  /* error reading -> exit */
-    
-	/* calculate FFT */
+    /* get samples from rtlsdr */
+    if (read_rtlsdr())
+        return FALSE;           /* error reading -> exit */
+
+    /* calculate FFT */
     run_fft();
-	
-	/* update plot */
-	cairo_t *cr;
-	cr = gdk_cairo_create(gtk_widget_get_window(GTK_WIDGET(darea)));
-	draw_fft(cr);
+
+    /* update plot */
+    cairo_t        *cr;
+
+    cr = gdk_cairo_create(gtk_widget_get_window(GTK_WIDGET(darea)));
+    draw_fft(cr);
     if (freq_changed)
     {
         draw_text(cr);
         //freq_changed = FALSE;
     }
-	cairo_destroy(cr);
-	
-	return TRUE;
+    cairo_destroy(cr);
+
+    return TRUE;
 }
 
 int main(int argc, char *argv[])
 {
     /* GtkWidget is the storage type for widgets */
-    GtkWidget *window;
-    guint  tid;
-    int opt;
-    
-    gtk_init (&argc, &argv);
+    GtkWidget      *window;
+    guint           tid;
+    int             opt;
+
+    gtk_init(&argc, &argv);
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_widget_add_events(window, GDK_KEY_PRESS_MASK);
 
-    g_signal_connect(window, "delete-event", G_CALLBACK (delete_event), NULL);
-    g_signal_connect(window, "destroy", G_CALLBACK (destroy), NULL);
-    g_signal_connect(window, "key_press_event", G_CALLBACK (keypress_cb), NULL);
+    g_signal_connect(window, "delete-event", G_CALLBACK(delete_event), NULL);
+    g_signal_connect(window, "destroy", G_CALLBACK(destroy), NULL);
+    g_signal_connect(window, "key_press_event", G_CALLBACK(keypress_cb), NULL);
 
     /* parse cmd line */
-    while ((opt = getopt(argc, argv, "d:f:p:h")) != -1) {
-        switch (opt) {
-            case 'd':
-                dev_index = atoi(optarg);
-                break;
-            case 'f':
-                frequency = atoll(optarg);
-                break;
-            case 'p':
-                ppm_error = atoi(optarg);
-                break;
-            case 'h':
-            case '?':
-            default:
-                printf("usage: rtlizer [-d device_index] [-f frequency [Hz]] [-p ppm_error] [WIDTHxHEIGHT+XOFF+YOFF]\n");
-                exit(EXIT_SUCCESS);
-                break;
+    while ((opt = getopt(argc, argv, "d:f:p:h")) != -1)
+    {
+        switch (opt)
+        {
+        case 'd':
+            dev_index = atoi(optarg);
+            break;
+        case 'f':
+            frequency = atoll(optarg);
+            break;
+        case 'p':
+            ppm_error = atoi(optarg);
+            break;
+        case 'h':
+        case '?':
+        default:
+            printf
+                ("usage: rtlizer [-d device_index] [-f frequency [Hz]] [-p ppm_error] [WIDTHxHEIGHT+XOFF+YOFF]\n");
+            exit(EXIT_SUCCESS);
+            break;
         }
     }
 
     /* default window size if no geometry is specified */
-    width = 320;  //gdk_screen_width();
-    height = 240; //gdk_screen_height();
+    width = 320;                //gdk_screen_width();
+    height = 240;               //gdk_screen_height();
     if (argc > optind)
     {
         if (!gtk_window_parse_geometry(GTK_WINDOW(window), argv[optind]))
@@ -365,18 +375,19 @@ int main(int argc, char *argv[])
     }
 
     gtk_window_set_default_size(GTK_WINDOW(window), width, height);
-    scale = (float)height/DYNAMIC_RANGE * SCREEN_FRAC;
-    yzero = (int)(height*(1.0f-SCREEN_FRAC));
-    text_margin = yzero/10;
+    scale = (float)height / DYNAMIC_RANGE * SCREEN_FRAC;
+    yzero = (int)(height * (1.0f - SCREEN_FRAC));
+    text_margin = yzero / 10;
 
     g_print("window size: %dx%d pixels\n", width, height);
     g_print("SCALE: %.2f / Y0: %d / TXTMARG: %d\n", scale, yzero, text_margin);
 
     gtk_widget_show(window);
-    gdk_window_set_cursor(gtk_widget_get_window(window), gdk_cursor_new(GDK_BLANK_CURSOR));
+    gdk_window_set_cursor(gtk_widget_get_window(window),
+                          gdk_cursor_new(GDK_BLANK_CURSOR));
 
     /* set up FFT */
-    fft_size = 2 * width/2;
+    fft_size = 2 * width / 2;
     fft_cfg = kiss_fft_alloc(fft_size, FALSE, NULL, NULL);
     fft_in = malloc(width * sizeof(kiss_fft_cpx));
     fft_out = malloc(width * sizeof(kiss_fft_cpx));
@@ -385,11 +396,10 @@ int main(int argc, char *argv[])
     setup_rtlsdr();
 
     tid = g_timeout_add(50, timeout_cb, window);
-    
+
     gtk_main();
-    
+
     g_source_remove(tid);
-    
+
     return 0;
 }
-
