@@ -17,7 +17,7 @@ After=udev.service
 
 [Service]
 Type=simple
-ExecStart=/home/debian/rtlizer/run_rtlizer.sh
+ExecStart=/usr/bin/xinit /usr/local/bin/rtlizer
 #Restart=on-abort
 
 [Install]
