@@ -1,13 +1,25 @@
-# Start rtlizer automatically on a Beaglebone that uses systemd.
+# Systemd service script for starting rtlizer automatically on a Beaglebone.
+#
+# 1. Edit the ExecStart line to suit your needs
+# 2. Copy this file to /etc/systemd/system/ and reload the services using:
+#        sudo systemctl --system daemon-reload
+# 3. Test the service with:
+#        sudo systemctl start rtlizer.service
+#        sudo systemctl stop rtlizer.service
+# 4. Enable / disable the service using:
+#        sudo systemctl enable rtlizer.service
+#        sudo systemctl disable rtlizer.service 
+#
 
 [Unit]
 Description=Run rtlizer
-After=multi-user.target
+After=udev.service
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/xinit /home/root/rtlizer/rtlizer
+ExecStart=/home/debian/rtlizer/run_rtlizer.sh
+#Restart=on-abort
 
 [Install]
-#WantedBy=multi-user.target
+WantedBy=multi-user.target
 
