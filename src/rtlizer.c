@@ -277,8 +277,8 @@ static void run_fft()
 
     for (i = 0; i < fft_size; i++)
     {
-        fft_in[i].r = ((float)buffer[2 * i]) / 255.f;
-        fft_in[i].i = ((float)buffer[2 * i + 1]) / 255.f;
+        fft_in[i].r = (float)(buffer[2 * i] - 127) / 127.f;
+        fft_in[i].i = (float)(buffer[2 * i + 1] - 127) / 127.f;
     }
     kiss_fft(fft_cfg, fft_in, fft_out);
     for (i = 0; i < fft_size; i++)
