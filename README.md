@@ -23,7 +23,11 @@ Building
 The source code is located in the src/ subdirectory. You can imply type "make"
 in this directory and the program should build on any platform where the
 dependencies are met. The build process will generate a single executable
-called rtlizer and there is no need for any further installation.
+called rtlizer and you can copy this to a location of your choice.
+
+Instructions for setting rtlizer up on specific targets are available for:
+* Beaglebone running Debian 7 console image
+
 
 Usage
 -----
@@ -36,8 +40,14 @@ string, e.g.
 
 There are also other command line options are available, see rtlizer -h.
 
-Instructions for setting up specific targets are available for:
-* Beaglebone running Debian 7 console image
+You can use the following keys while rtlizer is running:
+
+    LEFT    Increase frequency
+    RIGHT   Decrease frequency
+    UP      Increase sample rate
+    DOWN    Decrease sample rate
+    ENTER   Exit
+
 
 Credits
 -------
