@@ -33,28 +33,27 @@
 #define DYNAMIC_RANGE 90.f      /* -dBFS coreresponding to bottom of screen */
 #define SCREEN_FRAC 0.7f        /* fraction of screen height used for FFT */
 
-uint8_t        *buffer;
-uint32_t        dev_index = 0;
-uint32_t        frequency = 98000000;
-uint32_t        samp_rate = DEFAULT_SAMPLE_RATE;
-uint32_t        buff_len = 2048;
-int             ppm_error = 0;
+static uint8_t *buffer;
+static uint32_t dev_index = 0;
+static uint32_t frequency = 98000000;
+static uint32_t samp_rate = DEFAULT_SAMPLE_RATE;
+static uint32_t buff_len = 2048;
+static int      ppm_error = 0;
 
-float           lut[256];       /* look-up table to convert U8 to +/- 1.0f */
+static float    lut[256];       /* look-up table to convert U8 to +/- 1.0f */
 
-int             fft_size = 320;
-kiss_fft_cfg    fft_cfg;
-kiss_fft_cpx   *fft_in;
-kiss_fft_cpx   *fft_out;
-float          *log_pwr_fft;    /* dbFS relative to 1.0 */
-float           scale;
-int             yzero = 0;
-int             text_margin = 0;
+static int      fft_size = 320;
+static kiss_fft_cfg fft_cfg;
+static kiss_fft_cpx *fft_in;
+static kiss_fft_cpx *fft_out;
+static float   *log_pwr_fft;    /* dbFS relative to 1.0 */
+static float    scale;
+static int      yzero = 0;
+static int      text_margin = 0;
 
 static rtlsdr_dev_t *dev = NULL;
 static gint     width, height;  /* screen width and height */
 static gboolean freq_changed = TRUE;
-
 
 
 static gboolean delete_event(GtkWidget * widget, GdkEvent * e, gpointer d)
