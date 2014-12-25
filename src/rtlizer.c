@@ -40,6 +40,8 @@ uint32_t        samp_rate = DEFAULT_SAMPLE_RATE;
 uint32_t        buff_len = 2048;
 int             ppm_error = 0;
 
+float           lut[256];       /* look-up table to convert U8 to +/- 1.0f */
+
 int             fft_size = 320;
 kiss_fft_cfg    fft_cfg;
 kiss_fft_cpx   *fft_in;
@@ -277,8 +279,8 @@ static void run_fft()
 
     for (i = 0; i < fft_size; i++)
     {
-        fft_in[i].r = (float)(buffer[2 * i] - 127) / 127.f;
-        fft_in[i].i = (float)(buffer[2 * i + 1] - 127) / 127.f;
+        fft_in[i].r = lut[buffer[2 * i]];
+        fft_in[i].i = lut[buffer[2 * i + 1]];
     }
     kiss_fft(fft_cfg, fft_in, fft_out);
     for (i = 0; i < fft_size; i++)
@@ -330,6 +332,7 @@ int main(int argc, char *argv[])
     GtkWidget      *window;
     guint           tid;
     int             opt;
+    int             i;
 
     gtk_init(&argc, &argv);
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -385,6 +388,10 @@ int main(int argc, char *argv[])
     gtk_widget_show(window);
     gdk_window_set_cursor(gtk_widget_get_window(window),
                           gdk_cursor_new(GDK_BLANK_CURSOR));
+
+    /* LUT */
+    for (i = 0; i < 256; i++)
+        lut[i] = (float)i / 127.5f - 1.f;
 
     /* set up FFT */
     fft_size = 2 * width / 2;
