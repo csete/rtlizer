@@ -1,10 +1,15 @@
-rtlizer 2.0 (tbd)
+rtlizer 2.1 ( tbd )
 
-* Support for Beaglebone running official Debian console image.
-* Fixed bug that caused a strong DC spike to be present.
+ - Support for Raspberry Pi with Adafruit piTFT screen.
 
 
-rtlizer 1.0 (Feb 15, 2013)
+rtlizer 2.0 (2014/12/25)
 
-* First release working on Beaglebone with LCD cape and running Angstrom.
+ - Support for Beaglebone running official Debian console image.
+ - Fixed bug that caused a strong DC spike to be present.
+
+
+rtlizer 1.0 (2013/02/15)
+
+ - First release working on Beaglebone with LCD cape and running Angstrom.
 
