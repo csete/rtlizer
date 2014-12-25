@@ -1,0 +1,10 @@
+rtlizer 2.0 (tbd)
+
+* Support for Beaglebone running official Debian console image.
+* Fixed bug that caused a strong DC spike to be present.
+
+
+rtlizer 1.0 (Feb 15, 2013)
+
+* First release working on Beaglebone with LCD cape and running Angstrom.
+
