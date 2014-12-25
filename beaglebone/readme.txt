@@ -67,7 +67,7 @@ application.
 
 Build and install rtlizer
 
-  $ wget https://github.com/csete/rtlizer/archive/rtlizer-2.0.tar.gz
+  $ wget https://github.com/csete/rtlizer/archive/v2.0.tar.gz -O rtlizer-2.0.tar.gz
   $ tar xvf rtlizer-2.0.tar.gz
   $ cd rtlizer-2.0
   $ make -C src
