@@ -3,9 +3,12 @@ Rtlizer
 
 Rtlizer is a simple spectrum analyzer application written using rtlsdr,
 kiss_fft and Gtk+. It was originally created as a Beaglebone + rtlsdr demo,
-but it will probably run on anything with rtlsdr and Gtk+ installed.
+but it will probably run on anything with rtlsdr and Gtk+ installed,
+including a Raspberry Pi equipped with an Adafruit piTFT display.
 
 <a href="http://www.flickr.com/photos/csete/8474999050/" title="Beaglebone rtlizer"><img src="http://farm9.staticflickr.com/8385/8474999050_4d418b232d.jpg" width="500" height="254" alt="Beaglebone rtlizer"></a>
+
+<a href="https://www.flickr.com/photos/csete/15918779698" title="Rtlizer running on the Raspberry Pi by Alexandru Csete, on Flickr"><img src="https://farm9.staticflickr.com/8572/15918779698_70a4b6bdc0.jpg" width="500" height="238" alt="Rtlizer running on the Raspberry Pi"></a>
 
 You can see a short video demo on YouTube:
 https://www.youtube.com/watch?v=jzmFXreuFR4
