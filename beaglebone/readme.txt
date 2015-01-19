@@ -6,8 +6,9 @@ been tested with the following items:
 
  - Beaglebone Black and White
  - LCD3 cape
+ - 4DCAPE_43
  - An rtlsdr dongle with R820T tuner (other tuners should work as well)
- - Beaglebone Debian 7.7 console image 2014-12-19
+ - Beaglebone Debian 7.7 console image 2014-12-19, 2014-12-31
 
 The whole system fits well in 2 GB flash (SD or eMMC) and requires about
 50 MB RAM. I have only tested using SD cards, however, I expect it would
