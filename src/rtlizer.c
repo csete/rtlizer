@@ -30,7 +30,7 @@
 
 
 #define DEFAULT_SAMPLE_RATE 2048000
-#define DYNAMIC_RANGE 90.f      /* -dBFS coreresponding to bottom of screen */
+#define DYNAMIC_RANGE 70.f      /* -dBFS coreresponding to bottom of screen */
 #define SCREEN_FRAC 0.7f        /* fraction of screen height used for FFT */
 
 static uint8_t *buffer;
@@ -185,7 +185,7 @@ static void draw_fft(cairo_t * cr)
     cairo_stroke_preserve(cr);
     cairo_fill(cr);
 
-    //cairo_set_source_rgba(cr, 0.49, 0.50, 0.63, 0.85);
+    //cairo_set_source_rgba(cr, 0.30, 0.450, 0.60, 1.0);
     cairo_set_source_rgba(cr, 0.7, 0.7, 0.7, 0.9);
 
     int             x, y;
@@ -274,7 +274,8 @@ static void run_fft()
 {
     int             i;
     kiss_fft_cpx    pt;
-    float           pwr;
+    float           pwr, lpwr;
+    float           gain;
 
     for (i = 0; i < fft_size; i++)
     {
@@ -296,9 +297,12 @@ static void run_fft()
             pt.i = fft_out[i - fft_size / 2].i / fft_size;
         }
         pwr = pt.r * pt.r + pt.i * pt.i;
+        lpwr = 10.f * log10(pwr + 1.0e-20f);
 
-        log_pwr_fft[i] = 10.f * log10(pwr + 1.0e-20f);
+        gain = 0.3 * (100.f + lpwr) / 100.f;
+        log_pwr_fft[i] = log_pwr_fft[i] * (1.f - gain) + lpwr * gain;
     }
+
 }
 
 gint timeout_cb(gpointer darea)
@@ -398,10 +402,12 @@ int main(int argc, char *argv[])
     fft_in = malloc(width * sizeof(kiss_fft_cpx));
     fft_out = malloc(width * sizeof(kiss_fft_cpx));
     log_pwr_fft = malloc(width * sizeof(float));
+    for (i = 0; i < width; i++)
+        log_pwr_fft[i] = -70.f;
 
     setup_rtlsdr();
 
-    tid = g_timeout_add(50, timeout_cb, window);
+    tid = g_timeout_add(40, timeout_cb, window);
 
     gtk_main();
 
