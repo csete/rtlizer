@@ -68,9 +68,9 @@ application.
 
 Build and install rtlizer
 
-  $ wget https://github.com/csete/rtlizer/archive/v2.0.tar.gz -O rtlizer-2.0.tar.gz
-  $ tar xvf rtlizer-2.0.tar.gz
-  $ cd rtlizer-2.0
+  $ wget https://github.com/csete/rtlizer/archive/v2.1.tar.gz -O rtlizer-2.1.tar.gz
+  $ tar xvf rtlizer-2.1.tar.gz
+  $ cd rtlizer-2.1
   $ make -C src
 
 There should be no errors or warnings and there should be a binary 

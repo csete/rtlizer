@@ -38,9 +38,9 @@ Install the packages necessary to build and run rtlizer:
 
 Download and build rtlizer:
 
-  $ wget https://github.com/csete/rtlizer/archive/v2.0.tar.gz -O rtlizer-2.0.tar.gz
-  $ tar xvf rtlizer-2.0.tar.gz
-  $ cd rtlizer-2.0
+  $ wget https://github.com/csete/rtlizer/archive/v2.1.tar.gz -O rtlizer-2.1.tar.gz
+  $ tar xvf rtlizer-2.1.tar.gz
+  $ cd rtlizer-2.1
   $ make -C src
   $ sudo cp src/rtlizer /usr/local/bin/
 
