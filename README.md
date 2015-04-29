@@ -16,7 +16,7 @@ https://www.youtube.com/watch?v=jzmFXreuFR4
 Dependencies
 ------------
 
-* [rtlsdr](http://sdr.osmocom.org/trac/wiki/rtl-sdr)
+* [rtlsdr](http://sdr.osmocom.org/trac/wiki/rtl-sdr) (requires libusb-1.0)
 * [Gtk+ v3](http://www.gtk.org/)
 * [kiss_fft](http://kissfft.sourceforge.net/) (included)
 
